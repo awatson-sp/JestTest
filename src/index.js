@@ -1,10 +1,29 @@
 import express from 'express';
-import { IndexRouter } from "./routes"
-import { errorMiddleware } from "./middlewares/error";
+//Not working. For testing purposes only
+const request = require('supertest');
+const express = require('express');
 
 const app = express();
-app.use(express.json());
-app.use("/",IndexRouter);
-app.use(errorMiddleware);
 
+app.get('/user', function(req, res) {
+  res.status(200).json({ name: 'john' });
+});
+
+request(app, { http2: true })
+  .get('/user')
+  .expect('Content-Type', /json/)
+  .expect('Content-Length', '15')
+  .expect(200)
+  .end(function(err, res) {
+    if (err) throw err;
+  });
+
+request.agent(app, { http2: true })
+  .get('/user')
+  .expect('Content-Type', /json/)
+  .expect('Content-Length', '15')
+  .expect(200)
+  .end(function(err, res) {
+    if (err) throw err;
+});
 export default app;
